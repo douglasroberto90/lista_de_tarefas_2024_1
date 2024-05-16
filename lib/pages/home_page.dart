@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:lista_de_tarefas_2024_1/widgets/item_tarefa.dart';
+import '../models/tarefa.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,6 +10,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List<Tarefa> tarefas = [];
+  TextEditingController controllerTarefa = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,6 +28,7 @@ class _HomePageState extends State<HomePage> {
                     child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: TextField(
+                    controller: controllerTarefa,
                     decoration: InputDecoration(
                       label: Text("Nova tarefa"),
                     ),
@@ -32,14 +36,52 @@ class _HomePageState extends State<HomePage> {
                 )),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: ElevatedButton(onPressed: () {}, child: Text("ADD")),
+                  child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          Tarefa tarefa = Tarefa(
+                              titulo: controllerTarefa.text, realizado: false);
+                          tarefas.add(tarefa);
+                          controllerTarefa.clear();
+                        });
+                      },
+                      child: Text("ADD")),
                 )
               ],
             ),
-            Row(
-              children: [ItemTarefa(nomeTarefa: "Tarefa")],
+            Expanded(
+              child: ListView.builder(
+                  itemCount: tarefas.length, itemBuilder: contruirItem),
             ),
           ],
         ));
+  }
+
+  Widget contruirItem(BuildContext context, int index) {
+    return Dismissible(
+      key: Key(DateTime.now().millisecondsSinceEpoch.toString()),
+      child: CheckboxListTile(
+          secondary:
+              tarefas[index].realizado ? Icon(Icons.check) : Icon(Icons.error),
+          title: Text(tarefas[index].titulo),
+          value: tarefas[index].realizado,
+          onChanged: (checked) {
+            setState(() {
+              tarefas[index].realizado = checked!;
+            });
+          }),
+      direction: DismissDirection.startToEnd,
+      background: Container(
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Icon(Icons.delete),),
+        decoration: BoxDecoration(color: Colors.red),
+      ),
+      onDismissed: (direction) {
+        setState(() {
+          tarefas.removeAt(index);
+        });
+      },
+    );
   }
 }
