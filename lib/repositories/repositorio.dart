@@ -1,14 +1,10 @@
-
-
 import 'dart:convert';
-
 import '../models/tarefa.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:io';
 
 class Repositorio{
 
-    late SharedPreferences prefs;
+  late SharedPreferences prefs;
 
   Future<void> salvarDados(List<Tarefa> tarefas) async {
     prefs = await SharedPreferences.getInstance();
@@ -21,8 +17,18 @@ class Repositorio{
     prefs.setStringList("ListaDeTarefas", listaParaSalvar);
   }
 
-  List<Tarefa> recuperarDados(){
+  Future<List<Tarefa>> recuperarDados() async {
+    prefs = await SharedPreferences.getInstance();
     List<Tarefa> tarefas = [];
+    List<String>? tarefasEmString = prefs.getStringList('ListaDeTarefas');
+    if (tarefasEmString!=null){
+      for (String tarefa in tarefasEmString){
+        Map<String,dynamic> json = jsonDecode(tarefa);
+        //tarefas.add(Tarefa.deJson(json));
+        Tarefa task = Tarefa.deJson(json);
+        tarefas.add(task);
+      }
+    }
     return tarefas;
   }
 

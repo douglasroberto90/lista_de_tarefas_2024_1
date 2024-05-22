@@ -15,7 +15,7 @@ class Tarefa{
     return json;
   }
 
-  static Tarefa deJson (Map<String, String> json){
+  static Tarefa deJson (Map<String, dynamic> json){
     Tarefa tarefa = Tarefa(titulo: json["titulo"]!,
         realizado: json["realizado"]=="true"? true : false);
     return tarefa;
